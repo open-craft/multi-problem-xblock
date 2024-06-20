@@ -16,7 +16,7 @@ def getLibraryContentBlock():
     return LibraryContentBlock
 
 
-class SHOWANSWER:
+class L_SHOWANSWER:
     """
     Local copy of SHOWANSWER from xmodule/capa_block.py in edx-platform
     """
@@ -34,6 +34,17 @@ class SHOWANSWER:
     ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"
 
 
+class L_ShowCorrectness:
+    """
+    Local copy of ShowCorrectness from xmodule/graders.py in edx-platform
+    """
+
+    # Constants used to indicate when to show correctness
+    ALWAYS = "always"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+
+
 def getShowAnswerOptions():
     """Get SHOWANSWER constant from xmodule/capa_block.py"""
     try:
@@ -41,4 +52,14 @@ def getShowAnswerOptions():
         return SHOWANSWER
     except ModuleNotFoundError:
         log.warning('SHOWANSWER not found, using local copy')
-        return SHOWANSWER
+        return L_SHOWANSWER
+
+
+def getShowCorrectnessOptions():
+    """Get ShowCorrectness constant from xmodule/graders.py"""
+    try:
+        from xmodule.graders import ShowCorrectness
+        return ShowCorrectness
+    except ModuleNotFoundError:
+        log.warning('ShowCorrectness not found, using local copy')
+        return L_ShowCorrectness

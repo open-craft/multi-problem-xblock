@@ -13,7 +13,7 @@ try:
 except ModuleNotFoundError:  # For backward compatibility with releases older than Quince.
     from xblockutils.resources import ResourceLoader
 
-from .compat import getLibraryContentBlock, getShowAnswerOptions
+from .compat import getLibraryContentBlock, getShowAnswerOptions, getShowCorrectnessOptions
 from .utils import _
 
 # Globals ###########################################################
@@ -22,6 +22,7 @@ loader = ResourceLoader(__name__)
 logger = logging.getLogger(__name__)
 LibraryContentBlock = getLibraryContentBlock()
 SHOWANSWER = getShowAnswerOptions()
+ShowCorrectness = getShowCorrectnessOptions()
 
 
 # Classes ###########################################################
@@ -126,8 +127,39 @@ class MultiProblemBlock(
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        Set current_slide as non editable field
+        """
         non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             MultiProblemBlock.current_slide
         ])
         return non_editable_fields
+
+    def _process_display_feedback(self, child):
+        """
+        Set child correctness based on parent display_feedback
+        """
+        if not hasattr(child, 'show_correctness'):
+            return
+        # If display_feedback is IMMEDIATELY, show answers immediately after submission as well as at the end
+        # In other cases i.e., END_OF_TEST & NEVER, set show_correctness to never
+        # and display correctness via force argument in the last slide if display_feedback set to END_OF_TEST
+        child.show_correctness = (
+            ShowCorrectness.ALWAYS if self.display_feedback == DISPLAYFEEDBACK.IMMEDIATELY else ShowCorrectness.NEVER
+        )
+
+    def post_editor_saved(self, user, old_metadata, old_content):
+        """
+        Update child field values based on parent block.
+        child.showanswer <- self.showanswer
+        child.showanswer <- self.showanswer
+        child.show_correctness <- ALWAYS if display_feedback == IMMEDIATELY else NEVER
+        """
+        super().post_editor_saved(user, old_metadata, old_content)
+        for child in self.get_children():
+            if hasattr(child, 'showanswer'):
+                child.showanswer = self.showanswer
+            if hasattr(child, 'weight'):
+                child.weight = self.weight
+            self._process_display_feedback(child)
