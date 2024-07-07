@@ -1,0 +1,16 @@
+/* Hide all slides by default: */
+.slide {
+  display: none;
+}
+
+.btn-primary-outline {
+  border: 1px solid #15376D !important;
+  background: #FFFFFF;
+  border-radius: 4px;
+}
+
+.problem-slide-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}

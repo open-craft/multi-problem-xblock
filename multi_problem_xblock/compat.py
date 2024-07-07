@@ -63,3 +63,13 @@ def getShowCorrectnessOptions():
     except ModuleNotFoundError:
         log.warning('ShowCorrectness not found, using local copy')
         return L_ShowCorrectness
+
+
+def getStudentView():
+    """Get STUDENT_VIEW constant from xmodule/x_module.py"""
+    try:
+        from xmodule.x_module import STUDENT_VIEW
+        return STUDENT_VIEW
+    except ModuleNotFoundError:
+        log.warning('STUDENT_VIEW not found, using raw string')
+        return 'student_view'

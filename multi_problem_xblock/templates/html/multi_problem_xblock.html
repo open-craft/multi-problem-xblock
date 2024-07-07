@@ -1,0 +1,43 @@
+{% load i18n %}
+
+{% if title and show_title %}
+  <h2 class="hd hd-2 unit-title">${title}</h2>
+{% endif %}
+
+{% if show_bookmark_button %}
+  <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
+{% endif %}
+
+<div class="problem-slide-header">
+  <button type="button" class="prevBtn btn-default btn-primary-outline">
+    <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5.6668 10.5L6.8418 9.325L3.02513 5.5L6.8418 1.675L5.6668 0.5L0.666798 5.5L5.6668 10.5Z" fill="#15376D"/>
+    </svg>
+  </button>
+  <small class="slide-position text-gray">
+    {% blocktrans %}{{ self.current_slide }} of {{ items|length }}{% endblocktrans %}
+  </small>
+  <button type="button" class="nextBtn btn-default btn-primary-outline">
+    <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.33345 0.5L0.158447 1.675L3.97511 5.5L0.158447 9.325L1.33345 10.5L6.33345 5.5L1.33345 0.5Z" fill="#15376D"/>
+    </svg>
+  </button>
+</div>
+<div class="problem-slides">
+  {% for item in items %}
+  {% if item.content %}
+  <div class="slide multi-problem-child-{{ forloop.counter0 }}" data-id="{{ item.id }}">
+    {{ item.content|safe }}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% if reset_button %}
+<div class="problem-reset-btn-wrapper">
+  <button type="button" class="problem-reset-btn btn-link" data-value="{% trans 'Reset Problems' %}">
+    <span aria-hidden="true">{% trans 'Reset Problems' %}</span>
+    <span class="sr">{% trans 'Reset Problems' %}</span>
+  </button>
+</div>
+{% endif %}
