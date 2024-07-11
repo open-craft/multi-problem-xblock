@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="multi-problem-container px-4 py-5">
+<div class="multi-problem-container px-4 pt-5 pb-4">
   <div class="problem-slide-header">
     <button type="button" class="prevBtn btn-default btn-primary-outline">
       <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,12 +21,12 @@
       </svg>
     </button>
   </div>
-  <div class="problem-slides px-md-5 py-4">
+  <div class="problem-slides px-md-5">
     {% for item in items %}
     {% if item.content %}
     <div class="slide multi-problem-child-{{ forloop.counter0 }}" data-id="{{ item.id }}" id="{{ item.id }}">
       {{ item.content|safe }}
-      <div class="bookmark-button-wrapper">
+      <div class="bookmark-button-wrapper mt-4 mb-1">
         <button class="btn btn-link multi-problem-bookmark-buttons {% if item.is_bookmarked %} bookmarked {% endif %}"
                 aria-pressed="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
                 data-bookmark-id="{{ item.bookmark_id }}"

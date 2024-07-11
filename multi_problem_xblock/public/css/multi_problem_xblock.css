@@ -55,3 +55,14 @@
   content: var(--bookmarked-icon);
   font-family: FontAwesome;
 }
+
+.bookmark-button-wrapper {
+  display: flex;
+  justify-content: end;
+}
+
+@media only screen and (min-width: 768px) {
+  .bookmark-button-wrapper {
+    margin-right: -2.5rem;
+  }
+}
