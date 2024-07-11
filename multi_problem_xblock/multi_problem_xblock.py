@@ -54,7 +54,7 @@ class SCORE_DISPLAY_FORMAT:
 @XBlock.wants('library_tools')
 @XBlock.wants('studio_user_permissions')  # Only available in CMS.
 @XBlock.wants('user')
-@XBlock.needs('mako')
+@XBlock.needs('bookmarks')
 class MultiProblemBlock(LibraryContentBlock):
     # Override LibraryContentBlock resources_dir
     resources_dir = ''
@@ -185,19 +185,32 @@ class MultiProblemBlock(LibraryContentBlock):
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
+        jump_to_id = context.get('jumpToId')
+        bookmarks_service = self.runtime.service(self, 'bookmarks')
 
-        for child in self._get_selected_child_blocks():
+        if 'username' not in child_context:
+            user_service = self.runtime.service(self, 'user')
+            child_context['username'] = user_service.get_current_user().opt_attrs.get(
+                'edx-platform.username'
+            )
+
+        for index, child in enumerate(self._get_selected_child_blocks()):
+            child_id = str(child.location)
             if child is None:
                 # https://github.com/openedx/edx-platform/blob/448acc95f6296c72097102441adc4e1f79a7444f/xmodule/library_content_block.py#L391-L396
                 logger.error('Skipping display for child block that is None')
                 continue
+            if jump_to_id == child_id:
+                self.current_slide = index
 
             rendered_child = child.render(STUDENT_VIEW, child_context)
             fragment.add_fragment_resources(rendered_child)
             contents.append(
                 {
-                    'id': str(child.location),
+                    'id': child_id,
                     'content': rendered_child.content,
+                    'bookmark_id': "{},{}".format(child_context['username'], child_id),
+                    'is_bookmarked': bookmarks_service.is_bookmarked(usage_key=child.location),
                 }
             )
 
@@ -207,7 +220,6 @@ class MultiProblemBlock(LibraryContentBlock):
                 {
                     'items': contents,
                     'self': self,
-                    'show_bookmark_button': False,
                     'watched_completable_blocks': set(),
                     'completion_delay_ms': None,
                     'reset_button': self.allow_resetting_children,

@@ -1,5 +1,6 @@
 function MultiProblemBlock(runtime, element, initArgs) {
   "use strict";
+  var $element = $(element);
 
   var gettext;
   var ngettext;
@@ -76,6 +77,20 @@ function MultiProblemBlock(runtime, element, initArgs) {
           XBlock.initializeBlock(child);
         });
       },
+    });
+  });
+
+  window.RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
+    var $bookmarkButtonElements = $element.find('.multi-problem-bookmark-buttons');
+    $bookmarkButtonElements.each(function() {
+      return new BookmarkButton({
+        el: $(this),
+        bookmarkId: $(this).data('bookmarkId'),
+        usageId: $(this).parent().parent().data('id'),
+        bookmarked: $(this).data('isBookmarked'),
+        apiUrl: $(this).data('bookmarksApiUrl'),
+        bookmarkText: gettext('Bookmark this question'),
+      });
     });
   });
 }

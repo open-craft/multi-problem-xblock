@@ -1,4 +1,9 @@
 /* Hide all slides by default: */
+:root {
+  --bookmark-icon: "\f097"; /* .fa-bookmark-o */
+  --bookmarked-icon: "\f02e"; /* .fa-bookmark */
+}
+
 .slide {
   display: none;
 }
@@ -7,10 +12,46 @@
   border: 1px solid #15376D !important;
   background: #FFFFFF;
   border-radius: 4px;
+  height: fit-content;
 }
 
 .problem-slide-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  align-items: end;
+}
+
+.multi-problem-container {
+  box-shadow: 0px 0px 10px 0px #0000001A;
+  radius: 4px;
+}
+
+.problem-result-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.see-test-results:hover {
+  background-color: #065683 !important;
+  background-image: none !important;
+}
+
+.see-test-results:focus {
+  background-color: #065683 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+
+.multi-problem-bookmark-buttons::before {
+  padding-right: 2px;
+  content: var(--bookmark-icon);
+  font-family: FontAwesome;
+}
+
+.multi-problem-bookmark-buttons.bookmarked::before {
+  padding-right: 2px;
+  content: var(--bookmarked-icon);
+  font-family: FontAwesome;
 }
