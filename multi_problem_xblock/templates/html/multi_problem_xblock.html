@@ -1,60 +1,73 @@
 {% load i18n %}
 
-<div class="multi-problem-container px-4 pt-5 pb-4">
-  <div class="problem-slide-header">
-    <button type="button" class="prevBtn btn-default btn-primary-outline">
-      <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M5.6668 10.5L6.8418 9.325L3.02513 5.5L6.8418 1.675L5.6668 0.5L0.666798 5.5L5.6668 10.5Z" fill="#15376D"/>
-      </svg>
-    </button>
-    <div class="text-center">
-      <small class="slide-position text-gray">
-        {% blocktrans %}{{ self.current_slide }} of {{ items|length }}{% endblocktrans %}
-      </small>
-      {% if self.display_name %}
-      <h2 class="hd hd-2">{{ self.display_name }}</h2>
-      {% endif %}
-    </div>
-    <button type="button" class="nextBtn btn-default btn-primary-outline">
-      <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1.33345 0.5L0.158447 1.675L3.97511 5.5L0.158447 9.325L1.33345 10.5L6.33345 5.5L1.33345 0.5Z" fill="#15376D"/>
-      </svg>
-    </button>
+<div class="multi-problem-container">
+  <!--Progress bar-->
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" style="width: {{ overall_progress }}%;" aria-valuenow="{{ overall_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
-  <div class="problem-slides px-md-5">
-    {% for item in items %}
-    {% if item.content %}
-    <div class="slide multi-problem-child-{{ forloop.counter0 }}" data-id="{{ item.id }}" id="{{ item.id }}">
-      {{ item.content|safe }}
-      <div class="bookmark-button-wrapper mt-4 mb-1">
-        <button class="btn btn-link multi-problem-bookmark-buttons {% if item.is_bookmarked %} bookmarked {% endif %}"
-                aria-pressed="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
-                data-bookmark-id="{{ item.bookmark_id }}"
-                data-is-bookmarked="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
-                data-bookmarks-api-url="{% url 'bookmarks' %}">
-          <span class="bookmark-text">
-            {% if item.is_bookmarked %}
-            {% trans 'Bookmarked' %}
-            {% else %}
-            {% trans 'Bookmark this question' %}
-            {% endif %}
-          </span>
-        </button>
+  <!--Problem slides-->
+  <div class="px-4 pt-5 pb-4 problem-slides-container">
+    <div class="problem-slide-header">
+      <button type="button" class="prevBtn btn-default btn-primary-outline">
+        <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.6668 10.5L6.8418 9.325L3.02513 5.5L6.8418 1.675L5.6668 0.5L0.666798 5.5L5.6668 10.5Z" fill="#15376D"/>
+        </svg>
+      </button>
+      <div class="text-center">
+        <small class="slide-position text-gray">
+          {% blocktrans %}{{ self.current_slide }} of {{ items|length }}{% endblocktrans %}
+        </small>
+        {% if self.display_name %}
+        <h2 class="hd hd-2">{{ self.display_name }}</h2>
+        {% endif %}
       </div>
+      <button type="button" class="nextBtn btn-default btn-primary-outline">
+        <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.33345 0.5L0.158447 1.675L3.97511 5.5L0.158447 9.325L1.33345 10.5L6.33345 5.5L1.33345 0.5Z" fill="#15376D"/>
+        </svg>
+      </button>
     </div>
-    {% endif %}
-    {% endfor %}
+    <div class="problem-slides px-md-5">
+      {% for item in items %}
+      {% if item.content %}
+      <div class="slide multi-problem-child-{{ forloop.counter0 }}" data-id="{{ item.id }}" id="{{ item.id }}">
+        {{ item.content|safe }}
+        <div class="bookmark-button-wrapper mt-4 mb-1">
+          <button class="btn btn-link multi-problem-bookmark-buttons {% if item.is_bookmarked %} bookmarked {% endif %}"
+                  aria-pressed="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
+                  data-bookmark-id="{{ item.bookmark_id }}"
+                  data-is-bookmarked="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
+                  data-bookmarks-api-url="{% url 'bookmarks' %}">
+            <span class="bookmark-text">
+              {% if item.is_bookmarked %}
+              {% trans 'Bookmarked' %}
+              {% else %}
+              {% trans 'Bookmark this question' %}
+              {% endif %}
+            </span>
+          </button>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <!--Test score container-->
+  <div class="problem-test-score-container">
   </div>
 </div>
 
-{% if reset_button %}
-<div class="problem-result-wrapper mt-4">
+<div class="problem-result-wrapper mt-4 d-flex">
+  {% if reset_button %}
   <button type="button" class="problem-reset-btn btn-link" data-value="{% trans 'Reset Problems' %}">
     <span aria-hidden="true">{% trans 'Reset Problems' %}</span>
     <span class="sr">{% trans 'Reset Problems' %}</span>
   </button>
-  <button type="button" class="btn-primary see-test-results">
+  <button type="button" class="btn-primary redo-test">
+    {% trans 'Redo test' %}
+  </button>
+  {% endif %}
+  <button type="button" class="btn-primary see-test-results" {% if overall_progress < 100 %}disabled{% endif %}>
     {% trans 'See test results' %}
   </button>
 </div>
-{% endif %}

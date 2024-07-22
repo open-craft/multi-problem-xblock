@@ -64,7 +64,11 @@ function MultiProblemBlock(runtime, element, initArgs) {
   $('.nextBtn', element).click((e) => nextPrev(1));
   $('.prevBtn', element).click((e) => nextPrev(-1));
 
-  $('.problem-reset-btn', element).click((e) => {
+  /**
+   * Reset problems in the given block
+   * @param {click even} e
+   */
+  function resetProblems(e) {
     e.preventDefault();
     $.post({
       url: runtime.handlerUrl(element, 'reset_selected_children'),
@@ -78,7 +82,66 @@ function MultiProblemBlock(runtime, element, initArgs) {
         });
       },
     });
+  }
+
+  $('.problem-reset-btn', element).click(resetProblems.bind(this));
+  $('.redo-test', element).click(resetProblems.bind(this));
+
+  var $problems = $(element).find('.problems-wrapper');
+  var $progressBar = $(element).find('.progress-bar');
+  var $resultsBtn = $(element).find('.see-test-results');
+
+  $problems.each(function() {
+    $(this).on("progressChanged", function() {
+      $.get(runtime.handlerUrl(element, 'get_overall_progress'), function( data ) {
+        $progressBar.css('width', data.overall_progress + '%');
+        $progressBar.attr('aria-valuenow', data.overall_progress);
+        if (data.overall_progress < 100) {
+          $resultsBtn.prop('disabled', true);
+        } else {
+          $resultsBtn.prop('disabled', false);
+        }
+      });
+    });
   });
+
+  $('.see-test-results', element).click((e) => {
+    e.preventDefault();
+    $.ajax({
+      url: runtime.handlerUrl(element, 'get_test_scores'),
+      type: 'GET',
+      dataType: 'html',
+      success: function( data ) {
+        $('.problem-slides-container', element).hide();
+        $('.problem-test-score-container', element).html(data);
+        var $accordions = $(element).find('.accordion');
+
+        $accordions.each(function() {
+          $(this).click(function() {
+            var $that = $(this);
+            $accordions.each(function() {
+              if (!$(this).is($that)) {
+                $(this).removeClass("active");
+                this.nextElementSibling.style.maxHeight = null;
+              }
+            });
+            $(this).toggleClass("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+              panel.style.maxHeight = null;
+            } else {
+              panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+          });
+        });
+
+        $('.see-test-results', element).hide();
+        $('.problem-reset-btn', element).hide();
+        $('.redo-test', element).show();
+      }
+    });
+  })
+
 
   window.RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
     var $bookmarkButtonElements = $element.find('.multi-problem-bookmark-buttons');
