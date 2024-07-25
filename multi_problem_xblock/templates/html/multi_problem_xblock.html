@@ -67,7 +67,9 @@
     {% trans 'Redo test' %}
   </button>
   {% endif %}
+  {% if show_results %}
   <button type="button" class="btn-primary see-test-results" {% if overall_progress < 100 %}disabled{% endif %}>
     {% trans 'See test results' %}
   </button>
+  {% endif %}
 </div>

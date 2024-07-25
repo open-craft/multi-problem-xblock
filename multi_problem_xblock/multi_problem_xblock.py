@@ -304,6 +304,7 @@ class MultiProblemBlock(LibraryContentBlock):
                     'watched_completable_blocks': set(),
                     'completion_delay_ms': None,
                     'reset_button': self.allow_resetting_children,
+                    'show_results': self.display_feedback != DISPLAYFEEDBACK.NEVER,
                     'overall_progress': self._calculate_progress_percentage(completed_problems, total_problems),
                 },
             )
