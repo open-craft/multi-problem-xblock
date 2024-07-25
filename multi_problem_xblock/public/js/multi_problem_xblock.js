@@ -1,6 +1,7 @@
 function MultiProblemBlock(runtime, element, initArgs) {
   "use strict";
   var $element = $(element);
+  var bookmarkButtonHandlers = [];
 
   var gettext;
   var ngettext;
@@ -70,6 +71,12 @@ function MultiProblemBlock(runtime, element, initArgs) {
    */
   function resetProblems(e) {
     e.preventDefault();
+    // remove all bookmarks under this block as it is possible that a
+    // bookmarked block is not selected on reset
+    bookmarkButtonHandlers.forEach(function (bookmarkButtonHander) {
+      bookmarkButtonHander.removeBookmark();
+    });
+
     $.post({
       url: runtime.handlerUrl(element, 'reset_selected_children'),
       success(data) {
@@ -146,14 +153,14 @@ function MultiProblemBlock(runtime, element, initArgs) {
   window.RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
     var $bookmarkButtonElements = $element.find('.multi-problem-bookmark-buttons');
     $bookmarkButtonElements.each(function() {
-      return new BookmarkButton({
+       bookmarkButtonHandlers.push(new BookmarkButton({
         el: $(this),
         bookmarkId: $(this).data('bookmarkId'),
         usageId: $(this).parent().parent().data('id'),
         bookmarked: $(this).data('isBookmarked'),
         apiUrl: $(this).data('bookmarksApiUrl'),
         bookmarkText: gettext('Bookmark this question'),
-      });
+      }));
     });
   });
 }
