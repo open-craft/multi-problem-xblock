@@ -90,16 +90,6 @@ class MultiProblemBlock(LibraryContentBlock):
         ],
     )
 
-    weight = Float(
-        display_name=_('Problem Weight'),
-        help=_(
-            'Defines the number of points each problem is worth. '
-            'If the value is not set, each response field in each problem is worth one point.'
-        ),
-        values={'min': 0, 'step': 0.1},
-        scope=Scope.settings,
-    )
-
     display_feedback = String(
         display_name=_('Display feedback'),
         help=_('Defines when to show feedback i.e. correctness in the problem slides.'),
@@ -150,24 +140,25 @@ class MultiProblemBlock(LibraryContentBlock):
         # If display_feedback is IMMEDIATELY, show answers immediately after submission as well as at the end
         # In other cases i.e., END_OF_TEST & NEVER, set show_correctness to never
         # and display correctness via force argument in the last slide if display_feedback set to END_OF_TEST
-        child.show_correctness = (
+        # HACK: For some reason, child.show_correctness is not saved if self.show_correctness is not updated.
+        self.show_correctness = child.show_correctness = (
             ShowCorrectness.ALWAYS if self.display_feedback == DISPLAYFEEDBACK.IMMEDIATELY else ShowCorrectness.NEVER
         )
 
-    def post_editor_saved(self, user, old_metadata, old_content):
+    def editor_saved(self, user, old_metadata, old_content):
         """
         Update child field values based on parent block.
         child.showanswer <- self.showanswer
-        child.showanswer <- self.showanswer
+        child.weight <- self.weight
         child.show_correctness <- ALWAYS if display_feedback == IMMEDIATELY else NEVER
         """
-        super().post_editor_saved(user, old_metadata, old_content)
+        if hasattr(super(), 'editor_saved'):
+            super().editor_saved(user, old_metadata, old_content)
         for child in self.get_children():
             if hasattr(child, 'showanswer'):
                 child.showanswer = self.showanswer
-            if hasattr(child, 'weight'):
-                child.weight = self.weight
             self._process_display_feedback(child)
+            child.save()
 
     @XBlock.json_handler
     def handle_slide_change(self, data, suffix=None):
