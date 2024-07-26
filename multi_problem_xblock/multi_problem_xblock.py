@@ -9,6 +9,7 @@ from copy import copy
 
 from web_fragments.fragment import Fragment
 from webob import Response
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Float, Integer, Scope, String
 
@@ -52,13 +53,15 @@ class SCORE_DISPLAY_FORMAT:
     X_OUT_OF_Y = 'x_out_of_y'
 
 
-@XBlock.wants('library_tools')
-@XBlock.wants('studio_user_permissions')  # Only available in CMS.
-@XBlock.wants('user')
+@XBlock.wants('library_tools', 'studio_user_permissions', 'user', 'completion')
 @XBlock.needs('bookmarks')
 class MultiProblemBlock(LibraryContentBlock):
     # Override LibraryContentBlock resources_dir
     resources_dir = ''
+
+    has_custom_completion = True
+    completion_mode = XBlockCompletionMode.COMPLETABLE
+
     display_name = String(
         display_name=_('Display Name'),
         help=_('The display name for this component.'),
@@ -118,6 +121,7 @@ class MultiProblemBlock(LibraryContentBlock):
         help=_('Defines min score for successful completion of the test'),
         scope=Scope.settings,
         values={'min': 0, 'step': 0.1, 'max': 1},
+        default=0,
     )
 
     next_page_on_submit = Boolean(
@@ -207,25 +211,26 @@ class MultiProblemBlock(LibraryContentBlock):
     @XBlock.handler
     def get_overall_progress(self, _, __):
         """
-        Fetch status of all child problem xblocks to get overall progress.
+        Fetch status of all child problem xblocks to get overall progress and updates completion percentage.
         """
         completed_problems, total_problems = self._get_problem_stats()
-        return Response(
-            json.dumps(
-                {
-                    'overall_progress': self._calculate_progress_percentage(completed_problems, total_problems),
-                }
-            )
-        )
+        progress = self._calculate_progress_percentage(completed_problems, total_problems)
+        completion = progress / 100
+        if completion == 1:
+            _, student_score, total_possible_score = self._prepare_user_score()
+            if student_score / total_possible_score < self.cut_off_score:
+                # Reserve 10% if user score is less than self.cut_off_score
+                completion = 0.9
+        self.publish_completion(completion)
+        return Response(json.dumps({'overall_progress': progress}))
 
-    @XBlock.handler
-    def get_test_scores(self, _data, _suffix):
+    def _prepare_user_score(self, include_question_answers=False) -> None:
         """
-        Get test score slide content
+        Calculate total user score and prepare list of question answers with user response.
+
+        Args:
+            include_question_answers (bool): Includes question and correct answers with user response.
         """
-        completed_problems, total_problems = self._get_problem_stats()
-        if completed_problems != total_problems and total_problems > 0:
-            return Response(_('All problems need to be completed before checking test results!'), status=400)
         question_answers = []
         student_score = 0
         total_possible_score = 0
@@ -238,20 +243,36 @@ class MultiProblemBlock(LibraryContentBlock):
                 score = child.score
                 student_score += score.raw_earned
                 total_possible_score += score.raw_possible
-                question_answers.append(
-                    {
-                        'question': lcp.find_question_label(answer_id),
-                        'answer': lcp.find_answer_text(answer_id, current_answer=student_answer),
-                        'correct_answer': lcp.find_correct_answer_text(answer_id),
-                        'is_correct': is_correct,
-                        'msg': correct_map.get_msg(answer_id),
-                    }
-                )
+                if include_question_answers:
+                    question_answers.append(
+                        {
+                            'question': lcp.find_question_label(answer_id),
+                            'answer': lcp.find_answer_text(answer_id, current_answer=student_answer),
+                            'correct_answer': lcp.find_correct_answer_text(answer_id),
+                            'is_correct': is_correct,
+                            'msg': correct_map.get_msg(answer_id),
+                        }
+                    )
+        return question_answers, student_score, total_possible_score
+
+    @XBlock.handler
+    def get_test_scores(self, _data, _suffix):
+        """
+        Get test score slide content
+        """
+        completed_problems, total_problems = self._get_problem_stats()
+        if completed_problems != total_problems and total_problems > 0:
+            return Response(_('All problems need to be completed before checking test results!'), status=400)
+        question_answers, student_score, total_possible_score = self._prepare_user_score(include_question_answers=True)
 
         if self.score_display_format == SCORE_DISPLAY_FORMAT.X_OUT_OF_Y:
             score_display = f'{student_score}/{total_possible_score}'
         else:
             score_display = f'{(student_score / total_possible_score):.0%}'
+
+        if (student_score / total_possible_score) >= self.cut_off_score:
+            self.publish_completion(1)
+
         template = loader.render_django_template(
             '/templates/html/multi_problem_xblock_test_scores.html',
             {
@@ -328,3 +349,11 @@ class MultiProblemBlock(LibraryContentBlock):
             'next_page_on_submit': next_page_on_submit,
         }
         return fragment
+
+    def publish_completion(self, progress: float):
+        """
+        Update block completion status.
+        """
+        completion_service = self.runtime.service(self, 'completion')
+        if completion_service and completion_service.completion_tracking_enabled():
+            self.runtime.publish(self, 'completion', {'completion': progress})
