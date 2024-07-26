@@ -10,7 +10,7 @@ from copy import copy
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Float, Integer, Scope, String
+from xblock.fields import Boolean, Float, Integer, Scope, String
 
 try:
     from xblock.utils.resources import ResourceLoader
@@ -118,6 +118,15 @@ class MultiProblemBlock(LibraryContentBlock):
         help=_('Defines min score for successful completion of the test'),
         scope=Scope.settings,
         values={'min': 0, 'step': 0.1, 'max': 1},
+    )
+
+    next_page_on_submit = Boolean(
+        display_name=_('Next page on submit'),
+        help=_(
+            'If true and display feedback is set to End of test or Never, next problem will be displayed automatically on submit.'
+        ),
+        scope=Scope.settings,
+        default=False,
     )
 
     current_slide = Integer(help=_('Stores current slide/problem number for a user'), scope=Scope.user_state, default=0)
@@ -295,6 +304,7 @@ class MultiProblemBlock(LibraryContentBlock):
                 }
             )
 
+        next_page_on_submit = self.next_page_on_submit and self.display_feedback != DISPLAYFEEDBACK.IMMEDIATELY
         fragment.add_content(
             loader.render_django_template(
                 '/templates/html/multi_problem_xblock.html',
@@ -305,6 +315,7 @@ class MultiProblemBlock(LibraryContentBlock):
                     'completion_delay_ms': None,
                     'reset_button': self.allow_resetting_children,
                     'show_results': self.display_feedback != DISPLAYFEEDBACK.NEVER,
+                    'next_page_on_submit': next_page_on_submit,
                     'overall_progress': self._calculate_progress_percentage(completed_problems, total_problems),
                 },
             )
@@ -312,5 +323,8 @@ class MultiProblemBlock(LibraryContentBlock):
         fragment.add_css_url(self.runtime.local_resource_url(self, 'public/css/multi_problem_xblock.css'))
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/multi_problem_xblock.js'))
         fragment.initialize_js('MultiProblemBlock')
-        fragment.json_init_args = {'current_slide': self.current_slide}
+        fragment.json_init_args = {
+            'current_slide': self.current_slide,
+            'next_page_on_submit': next_page_on_submit,
+        }
         return fragment

@@ -17,7 +17,11 @@ function MultiProblemBlock(runtime, element, initArgs) {
   }
 
 
-  var { current_slide: currentSlide = 0 } = initArgs;
+  var {
+    current_slide: currentSlide = 0,
+    next_page_on_submit: nextPageOnSubmit = false,
+  } = initArgs;
+
   showSlide(currentSlide)
 
   function showSlide(n) {
@@ -51,16 +55,17 @@ function MultiProblemBlock(runtime, element, initArgs) {
   function nextPrev(n) {
     // This function will figure out which tab to display
     var slides = $('.slide', element);
-    // Hide the current tab:
-    slides[currentSlide].style.display = "none";
-    // Increase or decrease the current tab by 1:
-    currentSlide = currentSlide + n;
+    // Calculate next slide position
+    var nextSlide = currentSlide + n;
     // if you have reached the end of the form...
-    if (currentSlide >= slides.length) {
+    if (nextSlide >= slides.length) {
       return false;
     }
+    // Hide the current tab:
+    slides[currentSlide].style.display = "none";
+    currentSlide = nextSlide;
     // Otherwise, display the correct tab:
-    showSlide(currentSlide);
+    showSlide(nextSlide);
   }
   $('.nextBtn', element).click((e) => nextPrev(1));
   $('.prevBtn', element).click((e) => nextPrev(-1));
@@ -109,6 +114,10 @@ function MultiProblemBlock(runtime, element, initArgs) {
           $resultsBtn.prop('disabled', false);
         }
       });
+      // initArgs.nextPageOnSubmit loose value on reset, so confirm value from html template
+      if ((nextPageOnSubmit || $('.multi-problem-container', element).data('nextPageOnSubmit'))) {
+        nextPrev(1);
+      }
     });
   });
 

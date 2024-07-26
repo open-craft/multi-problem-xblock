@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="multi-problem-container">
+<div class="multi-problem-container" data-next-page-on-submit="{% if next_page_on_submit %}true{% else %}false{% endif %}">
   <!--Progress bar-->
   <div class="progress">
     <div class="progress-bar" role="progressbar" style="width: {{ overall_progress }}%;" aria-valuenow="{{ overall_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
