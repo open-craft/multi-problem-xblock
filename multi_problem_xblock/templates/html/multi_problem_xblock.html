@@ -32,6 +32,7 @@
       {% if item.content %}
       <div class="slide multi-problem-child-{{ forloop.counter0 }}" data-id="{{ item.id }}" id="{{ item.id }}">
         {{ item.content|safe }}
+        {% if bookmarks_service_enabled %}
         <div class="bookmark-button-wrapper mt-4 mb-1">
           <button class="btn btn-link multi-problem-bookmark-buttons {% if item.is_bookmarked %} bookmarked {% endif %}"
                   aria-pressed="{% if item.is_bookmarked %}true{% else %}false{% endif %}"
@@ -47,6 +48,7 @@
             </span>
           </button>
         </div>
+        {% endif %}
       </div>
       {% endif %}
       {% endfor %}

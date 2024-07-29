@@ -71,7 +71,7 @@ test.python: ## run python unit tests in the local virtualenv
 	pytest --cov multi_problem_xblock $(TEST)
 
 test.unit: ## run all unit tests
-	tox $(TEST)
+	tox -- $(TEST)
 
 test: test.unit test.quality ## Run all tests
 	tox -e translations
