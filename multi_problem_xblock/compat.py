@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def getLibraryContentBlock():
+    """Get LibraryContentBlock from edx-platform if possible"""
     try:
         from xmodule.library_content_block import LibraryContentBlock  # pylint: disable=import-outside-toplevel
     except ModuleNotFoundError:

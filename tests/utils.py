@@ -1,8 +1,10 @@
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
+from sample_xblocks.basic.problem import ProblemBlock, String
 from webob import Request
 from workbench.runtime import WorkbenchRuntime
+from xblock.core import Scope
 from xblock.field_data import DictFieldData
 
 
@@ -33,7 +35,22 @@ def instantiate_block(cls, fields=None):
     block.runtime.get_block = lambda child_id: children[child_id]
     block.usage_key.__str__.return_value = usage_key
     block.usage_key.course_key.make_usage_key = lambda _, child_id: child_id
+    block.get_children = lambda: list(children.values())
     return block
+
+
+class SampleProblemBlock(ProblemBlock):
+    question = String(scope=Scope.content)
+    showanswer = String(scope=Scope.settings, default="")
+    show_correctness = String(scope=Scope.settings, default="")
+    lcp = Mock(student_answers={1: 1})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Return incremental mock question answer text each time it is called.
+        self.lcp.find_question_label.side_effect = [f'question{x}' for x in range(3)]
+        self.lcp.find_answer_text.side_effect = [f'answer{x}' for x in range(3)]
+        self.lcp.find_correct_answer_text.side_effect = [f'correct_answer{x}' for x in range(3)]
 
 
 class TestCaseMixin:

@@ -15,7 +15,9 @@
       </button>
       <div class="text-center">
         <small class="slide-position text-gray">
-          {% blocktrans %}{{ self.current_slide }} of {{ items|length }}{% endblocktrans %}
+          {% blocktrans with items_length=items|length current_slide=self.current_slide %}
+          {{ current_slide }} of {{ items_length }}
+          {% endblocktrans %}
         </small>
         {% if self.display_name %}
         <h2 class="hd hd-2">{{ self.display_name }}</h2>

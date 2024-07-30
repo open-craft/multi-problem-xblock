@@ -6,6 +6,8 @@ import json
 import logging
 from copy import copy
 
+from lxml import etree
+from lxml.etree import XMLSyntaxError
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -229,7 +231,7 @@ class MultiProblemBlock(LibraryContentBlock):
         self.publish_completion(completion)
         return Response(json.dumps({'overall_progress': progress}))
 
-    def _prepare_user_score(self, include_question_answers=False) -> tuple[list, float, float]:
+    def _prepare_user_score(self, include_question_answers=False):
         """
         Calculate total user score and prepare list of question answers with user response.
 
@@ -287,14 +289,14 @@ class MultiProblemBlock(LibraryContentBlock):
         )
         return Response(template, content_type='text/html')
 
-    def student_view_data(self, context):
+    def student_view_data(self, context=None):
         """
         Student view data for templates and javascript initialization
         """
         fragment = Fragment()
         items = []
         child_context = {} if not context else copy(context)
-        jump_to_id = context.get('jumpToId')
+        jump_to_id = child_context.get('jumpToId')
         bookmarks_service = self.runtime.service(self, 'bookmarks')
         total_problems = 0
         completed_problems = 0
@@ -370,3 +372,36 @@ class MultiProblemBlock(LibraryContentBlock):
         completion_service = self.runtime.service(self, 'completion')
         if completion_service and completion_service.completion_tracking_enabled():
             self.runtime.publish(self, 'completion', {'completion': progress})
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """Generate object from xml"""
+        children = []
+
+        for child in xml_object.getchildren():
+            try:
+                children.append(system.process_xml(etree.tostring(child)).scope_ids.usage_id)
+            except (XMLSyntaxError, AttributeError):
+                msg = (
+                    "Unable to load child when parsing Multi Problem Block. "
+                    "This can happen when a comment is manually added to the course export."
+                )
+                logger.error(msg)
+                if system.error_tracker is not None:
+                    system.error_tracker(msg)
+
+        definition = dict(xml_object.attrib.items())
+        return definition, children
+
+    def definition_to_xml(self, resource_fs):
+        """ Exports Library Content Block to XML """
+        xml_object = etree.Element('multi_problem')
+        for child in self.get_children():
+            self.runtime.add_block_as_child_node(child, xml_object)
+        # Set node attributes based on our fields.
+        for field_name, field in self.fields.items():
+            if field_name in ('children', 'parent', 'content'):
+                continue
+            if field.is_set_on(self):
+                xml_object.set(field_name, str(field.read_from(self)))
+        return xml_object
