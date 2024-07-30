@@ -349,9 +349,8 @@ types-python-dateutil==2.9.0.20240316
     # via
     #   -r requirements/quality.txt
     #   arrow
-urllib3==2.2.2 ; python_version > "3.10"
+urllib3==2.2.2
     # via
-    #   -c requirements/constraints.txt
     #   -r requirements/quality.txt
     #   botocore
     #   requests
