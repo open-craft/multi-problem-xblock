@@ -67,9 +67,9 @@ class BasicTests(TestCaseMixin, unittest.TestCase):
         )
         self.assertIn('<div class="problem-test-score-container">', student_fragment.content)
 
-    def test_student_view_data(self):
+    def test_student_view_context(self):
         """Verify student data used in templates"""
-        _, template_context, js_context = self.block.student_view_data({})
+        _, template_context, js_context = self.block.student_view_context({})
         items = template_context.pop('items')
         self.assertEqual(template_context, {
             'self': self.block,

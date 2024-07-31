@@ -208,7 +208,7 @@ class MultiProblemBlock(LibraryContentBlock):
         """
         total_problems = 0
         completed_problems = 0
-        for __, ___, child in self._children_iterator(filter_block_type='problem'):
+        for _index, _block_type, child in self._children_iterator(filter_block_type='problem'):
             if hasattr(child, 'is_submitted'):
                 total_problems += 1
                 if child.is_submitted():
@@ -216,7 +216,7 @@ class MultiProblemBlock(LibraryContentBlock):
         return completed_problems, total_problems
 
     @XBlock.handler
-    def get_overall_progress(self, __, ___):
+    def get_overall_progress(self, _data, _suffix=None):
         """
         Fetch status of all child problem xblocks to get overall progress and updates completion percentage.
         """
@@ -241,7 +241,7 @@ class MultiProblemBlock(LibraryContentBlock):
         question_answers = []
         student_score = 0
         total_possible_score = 0
-        for __, ___, child in self._children_iterator(filter_block_type='problem'):
+        for _index, _block_type, child in self._children_iterator(filter_block_type='problem'):
             lcp = child.lcp
             correct_map = lcp.correct_map
             for answer_id, student_answer in lcp.student_answers.items():
@@ -289,7 +289,7 @@ class MultiProblemBlock(LibraryContentBlock):
         )
         return Response(template, content_type='text/html')
 
-    def student_view_data(self, context=None):
+    def student_view_context(self, context=None):
         """
         Student view data for templates and javascript initialization
         """
@@ -329,7 +329,7 @@ class MultiProblemBlock(LibraryContentBlock):
                     'content': rendered_child.content,
                     'bookmark_id': '{},{}'.format(child_context['username'], child_id),
                     'is_bookmarked': (
-                        bookmarks_service.is_bookmarked(usage_key=child.location) if bookmarks_service else False
+                        bookmarks_service.is_bookmarked(usage_key=child.usage_key) if bookmarks_service else False
                     ),
                 }
             )
@@ -356,7 +356,7 @@ class MultiProblemBlock(LibraryContentBlock):
         """
         Student view
         """
-        fragment, template_context, js_context = self.student_view_data(context)
+        fragment, template_context, js_context = self.student_view_context(context)
         fragment.add_content(
             loader.render_django_template('/templates/html/multi_problem_xblock.html', template_context)
         )
