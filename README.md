@@ -11,7 +11,14 @@ root folder:
 
 ```bash
 $ pip install -r requirements.txt
+
 ```
+
+#### Install in development mode in tutor
+
+* Clone this repository somewhere locally, for example: `/path/to/multi-problem-xblock`.
+* Mount this directory in tutor using `tutor mounts add /path/to/multi-problem-xblock`
+* Run `tutor dev launch`
 
 ### Enabling in Studio
 
@@ -19,7 +26,12 @@ Go to `Settings -> Advanced` Settings and add `multi-problem` to `Advanced Modul
 
 ### Usage
 
-*TBD*
+* Click on `Advanced block` in studio unit authoring page and select `Multi Problem Block`.
+* Click on `Edit` button to select a library from which child problems needs to be fetched.
+* You can update the number of problems user will see using `Count` field, update cut-off score, display name etc.
+* `Display feedback` field allows authors to control when users can see problem answers, this updates `show_correctness` of all the child problems.
+
+#### Screenshots
 
 ### Testing with tox
 
@@ -29,7 +41,6 @@ Inside a fresh virtualenv, `cd` into the root folder of this repository
 ```bash
 $ make requirements
 ```
-
 
 You can then run the entire test suite via:
 
@@ -69,11 +80,10 @@ To comply with l10n requirements, XBlock is supposed to provide translations in
 
 [edx-docs-i18n]: http://edx.readthedocs.io/projects/xblock-tutorial/en/latest/edx_platform/edx_lms.html#internationalization-support
 
-Drag and Drop v2 XBlock aims to comply with i18n requirements for Open edX platform, including a stricter set of
-requirements for `edx.org` itself, thus providing the required files. So far only two translations are available:
+Multi Problem XBlock aims to comply with i18n requirements for Open edX platform, including a stricter set of
+requirements for `edx.org` itself, thus providing the required files. So far only one translation is available:
 
 * Default English translation
-* Fake "Esperanto" translation used to test i18n/l10n.
 
 Updates to translated strings are supposed to be propagated to `text.po` files. EdX [i18n_tools][edx-i18n-tools] is used here along GNU Gettext and a Makefile for automation.
 
@@ -107,7 +117,3 @@ translator from edX i18n-tools.
 ```bash
 $ make dummy_translations
 ```
-
-## Releasing
-
-To release a new version, update .travis.yml and setup.py to point to your new intended version number and create a new release with that version tag via Github.
