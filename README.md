@@ -41,7 +41,8 @@ Go to `Settings -> Advanced` Settings and add `multi-problem` to `Advanced Modul
 
 ![image](https://github.com/user-attachments/assets/f4243f26-c73a-4ebd-afbe-7e5bc84a9617)
 
-![image](https://github.com/user-attachments/assets/a92831f1-df7e-40d7-a323-9c514380a3ad)
+![image](https://github.com/user-attachments/assets/64074714-33cb-4bcb-a03f-c141113288df)
+
 
 
 ### Testing with tox
