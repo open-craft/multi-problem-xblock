@@ -33,6 +33,17 @@ Go to `Settings -> Advanced` Settings and add `multi-problem` to `Advanced Modul
 
 #### Screenshots
 
+![image](https://github.com/user-attachments/assets/b6cec90d-307b-43f8-856f-6cd54f28918a)
+
+![image](https://github.com/user-attachments/assets/645b5ab4-74e9-4237-be87-c81b3d432fdf)
+
+![image](https://github.com/user-attachments/assets/be11fe56-8c90-4f51-bce1-aa20ad852718)
+
+![image](https://github.com/user-attachments/assets/f4243f26-c73a-4ebd-afbe-7e5bc84a9617)
+
+![image](https://github.com/user-attachments/assets/a92831f1-df7e-40d7-a323-9c514380a3ad)
+
+
 ### Testing with tox
 
 Inside a fresh virtualenv, `cd` into the root folder of this repository
