@@ -267,6 +267,8 @@ class MultiProblemBlock(LibraryContentBlock):
         """
         Get test score slide content
         """
+        if self.display_feedback == DISPLAYFEEDBACK.NEVER:
+            return Response(_('Not allowed to see results'), 400)
         completed_problems, total_problems = self._get_problem_stats()
         if completed_problems != total_problems and total_problems > 0:
             return Response(_('All problems need to be completed before checking test results!'), status=400)
@@ -383,8 +385,8 @@ class MultiProblemBlock(LibraryContentBlock):
                 children.append(system.process_xml(etree.tostring(child)).scope_ids.usage_id)
             except (XMLSyntaxError, AttributeError):
                 msg = (
-                    "Unable to load child when parsing Multi Problem Block. "
-                    "This can happen when a comment is manually added to the course export."
+                    'Unable to load child when parsing Multi Problem Block. '
+                    'This can happen when a comment is manually added to the course export.'
                 )
                 logger.error(msg)
                 if system.error_tracker is not None:
@@ -394,7 +396,7 @@ class MultiProblemBlock(LibraryContentBlock):
         return definition, children
 
     def definition_to_xml(self, resource_fs):
-        """ Exports Library Content Block to XML """
+        """Exports Library Content Block to XML"""
         xml_object = etree.Element('multi_problem')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
