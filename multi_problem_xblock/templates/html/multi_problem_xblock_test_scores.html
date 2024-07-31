@@ -2,11 +2,18 @@
 
 <!--Test results-->
 <div class="multi-problem-test-results px-4 pt-5 pb-4">
-  <div class="text-center">
-    <small class="text-gray">
-      {% trans 'Complete!' %}
-    </small>
-    <h2 class="hd hd-2 text-center">{% trans 'Test score' %}</h2>
+  <div class="problem-slide-header">
+    <button type="button" class="back-to-problems btn-default btn-primary-outline">
+      <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.6668 10.5L6.8418 9.325L3.02513 5.5L6.8418 1.675L5.6668 0.5L0.666798 5.5L5.6668 10.5Z" fill="#15376D"/>
+      </svg>
+    </button>
+    <div class="score-header-text text-center">
+      <small class="text-gray">
+        {% trans 'Complete!' %}
+      </small>
+      <h2 class="hd hd-2 text-center">{% trans 'Test score' %}</h2>
+    </div>
   </div>
   <div class="accordion-container m-3 mt-5">
     {% for question_answer in question_answers %}

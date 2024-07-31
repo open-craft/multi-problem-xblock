@@ -181,3 +181,9 @@
 .multi-problem-test-results .hint-label {
   display: none;
 }
+
+.multi-problem-test-results .score-header-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}

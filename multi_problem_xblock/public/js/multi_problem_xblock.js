@@ -129,8 +129,17 @@ function MultiProblemBlock(runtime, element, initArgs) {
       dataType: 'html',
       success: function( data ) {
         $('.problem-slides-container', element).hide();
+        $('.problem-test-score-container', element).show();
         $('.problem-test-score-container', element).html(data);
         var $accordions = $(element).find('.accordion');
+
+        $('.back-to-problems', element).click((e) => {
+          $('.problem-test-score-container', element).hide();
+          $('.problem-slides-container', element).show();
+          $('.see-test-results', element).show();
+          $('.problem-reset-btn', element).show();
+          $('.redo-test', element).hide();
+        });
 
         $accordions.each(function() {
           $(this).click(function() {
@@ -157,7 +166,6 @@ function MultiProblemBlock(runtime, element, initArgs) {
       }
     });
   })
-
 
   window.RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
     var $bookmarkButtonElements = $element.find('.multi-problem-bookmark-buttons');
