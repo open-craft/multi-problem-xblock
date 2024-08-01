@@ -4,6 +4,7 @@
 
 import json
 import logging
+import math
 from copy import copy
 
 from lxml import etree
@@ -273,20 +274,26 @@ class MultiProblemBlock(LibraryContentBlock):
         if completed_problems != total_problems and total_problems > 0:
             return Response(_('All problems need to be completed before checking test results!'), status=400)
         question_answers, student_score, total_possible_score = self._prepare_user_score(include_question_answers=True)
+        passed = False
 
         if self.score_display_format == SCORE_DISPLAY_FORMAT.X_OUT_OF_Y:
             score_display = f'{student_score}/{total_possible_score}'
+            cut_off_score = f'{math.ceil(self.cut_off_score * total_possible_score)}/{total_possible_score}'
         else:
             score_display = f'{(student_score / total_possible_score):.0%}'
+            cut_off_score = f'{self.cut_off_score:.0%}'
 
         if (student_score / total_possible_score) >= self.cut_off_score:
             self.publish_completion(1)
+            passed = True
 
         template = loader.render_django_template(
             '/templates/html/multi_problem_xblock_test_scores.html',
             {
+                'cut_off_score': cut_off_score if self.cut_off_score else '',
                 'question_answers': question_answers,
                 'score': score_display,
+                'passed': passed,
             },
         )
         return Response(template, content_type='text/html')

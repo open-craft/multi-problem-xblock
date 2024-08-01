@@ -51,7 +51,15 @@
     {% endfor %}
     <div class="test-score-row p-3 pl-5 hd-5">
       <b>{% trans 'Test Score' %}</b>
-      <b class="test-score">{{ score }}</b>
+      {% if cut_off_score != '' %}<sup>1</sup>{% endif %}
+      <b class="test-score{% if not passed %} text-red{% endif %}">{{ score }}</b>
     </div>
   </div>
+  {% if cut_off_score != '' %}
+  <small class="pl-3">
+    <sup>1</sup>
+    {% trans 'Minimum score required for this to be marked as complete: ' %}
+    {{ cut_off_score }}
+  </small>
+  {% endif %}
 </div>

@@ -132,6 +132,10 @@
   margin-right: 10px;
 }
 
+.multi-problem-test-results .text-red {
+  color: #b4131b;
+}
+
 .multi-problem-test-results .accordion.correct:after {
   content: var(--correct-svg);
   margin-left: auto;
