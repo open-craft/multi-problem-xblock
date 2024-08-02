@@ -197,6 +197,7 @@ class MultiProblemBlock(LibraryContentBlock):
         """
         Generator to yield child problem blocks.
         """
+        # use selected_children method from LibraryContentBlock to get child xblocks.
         for index, (block_type, block_id) in enumerate(self.selected_children()):
             if filter_block_type and (block_type != filter_block_type):
                 continue
@@ -275,6 +276,7 @@ class MultiProblemBlock(LibraryContentBlock):
             return Response(_('All problems need to be completed before checking test results!'), status=400)
         question_answers, student_score, total_possible_score = self._prepare_user_score(include_question_answers=True)
         passed = False
+        allow_back_button = True
 
         if self.score_display_format == SCORE_DISPLAY_FORMAT.X_OUT_OF_Y:
             score_display = f'{student_score}/{total_possible_score}'
@@ -287,6 +289,10 @@ class MultiProblemBlock(LibraryContentBlock):
             self.publish_completion(1)
             passed = True
 
+        if self.display_feedback != DISPLAYFEEDBACK.IMMEDIATELY:
+            allow_back_button = False
+            self.current_slide = -1
+
         template = loader.render_django_template(
             '/templates/html/multi_problem_xblock_test_scores.html',
             {
@@ -294,9 +300,16 @@ class MultiProblemBlock(LibraryContentBlock):
                 'question_answers': question_answers,
                 'score': score_display,
                 'passed': passed,
+                'allow_back_button': allow_back_button,
             },
         )
         return Response(template, content_type='text/html')
+
+    @XBlock.handler
+    def reset_selected_children(self, data, suffix=None):
+        # reset current_slide field
+        self.current_slide = 0
+        return super().reset_selected_children(data, suffix)
 
     def student_view_context(self, context=None):
         """
@@ -314,7 +327,6 @@ class MultiProblemBlock(LibraryContentBlock):
             user_service = self.runtime.service(self, 'user')
             child_context['username'] = user_service.get_current_user().opt_attrs.get('edx-platform.username')
 
-        # use selected_children method from LibraryContentBlock to get child xblocks.
         for index, block_type, child in self._children_iterator():
             child_id = str(child.usage_key)
             if child is None:
@@ -344,6 +356,12 @@ class MultiProblemBlock(LibraryContentBlock):
             )
 
         next_page_on_submit = self.next_page_on_submit and self.display_feedback != DISPLAYFEEDBACK.IMMEDIATELY
+        overall_progress = self._calculate_progress_percentage(completed_problems, total_problems)
+
+        # Reset current_slide field if display_feedback is set to never after user completes all problems.
+        if overall_progress == 100 and self.current_slide == -1 and self.display_feedback == DISPLAYFEEDBACK.NEVER:
+            self.current_slide = 0
+
         template_context = {
             'items': items,
             'self': self,
@@ -352,7 +370,7 @@ class MultiProblemBlock(LibraryContentBlock):
             'reset_button': self.allow_resetting_children,
             'show_results': self.display_feedback != DISPLAYFEEDBACK.NEVER,
             'next_page_on_submit': next_page_on_submit,
-            'overall_progress': self._calculate_progress_percentage(completed_problems, total_problems),
+            'overall_progress': overall_progress,
             'bookmarks_service_enabled': bookmarks_service is not None,
         }
         js_context = {

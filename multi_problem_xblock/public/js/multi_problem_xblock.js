@@ -22,8 +22,6 @@ function MultiProblemBlock(runtime, element, initArgs) {
     next_page_on_submit: nextPageOnSubmit = false,
   } = initArgs;
 
-  showSlide(currentSlide)
-
   function showSlide(n) {
     var slides = $('.slide', element);
     slides[n].style.display = "block";
@@ -67,6 +65,7 @@ function MultiProblemBlock(runtime, element, initArgs) {
     // Otherwise, display the correct tab:
     showSlide(nextSlide);
   }
+
   $('.nextBtn', element).click((e) => nextPrev(1));
   $('.prevBtn', element).click((e) => nextPrev(-1));
 
@@ -128,9 +127,13 @@ function MultiProblemBlock(runtime, element, initArgs) {
       type: 'GET',
       dataType: 'html',
       success: function( data ) {
-        $('.problem-slides-container', element).hide();
         $('.problem-test-score-container', element).show();
         $('.problem-test-score-container', element).html(data);
+        if ($('.back-to-problems', element).length) {
+          $('.problem-slides-container', element).hide();
+        } else {
+          $('.problem-slides-container', element).remove();
+        }
         var $accordions = $(element).find('.accordion');
 
         $('.back-to-problems', element).click((e) => {
@@ -166,6 +169,13 @@ function MultiProblemBlock(runtime, element, initArgs) {
       }
     });
   })
+
+  // If user has already completed all problems, display test score slide
+  if (currentSlide === -1) {
+    $('.see-test-results', element).trigger('click');
+  } else {
+    showSlide(currentSlide)
+  }
 
   window.RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
     var $bookmarkButtonElements = $element.find('.multi-problem-bookmark-buttons');

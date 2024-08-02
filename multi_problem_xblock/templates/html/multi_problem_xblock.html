@@ -6,6 +6,7 @@
     <div class="progress-bar" role="progressbar" style="width: {{ overall_progress }}%;" aria-valuenow="{{ overall_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <!--Problem slides-->
+  {% if self.current_slide != -1 %}
   <div class="px-4 pt-5 pb-4 problem-slides-container">
     <div class="problem-slide-header">
       <button type="button" class="prevBtn btn-default btn-primary-outline">
@@ -56,6 +57,7 @@
       {% endfor %}
     </div>
   </div>
+  {% endif %}
   <!--Test score container-->
   <div class="problem-test-score-container">
   </div>
