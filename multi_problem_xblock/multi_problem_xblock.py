@@ -78,7 +78,9 @@ class MultiProblemBlock(LibraryContentBlock):
         display_name=_('Show Answer'),
         help=_(
             'Defines when to show the answer to the problem. '
-            'Acts as default value for showanswer field in each problem under this block'
+            'Acts as default value for showanswer field in each problem under this block. '
+            'NOTE: Do not change this field and `Library` field together, child show answer field '
+            'will not be updated.'
         ),
         scope=Scope.settings,
         default=SHOWANSWER.FINISHED,
@@ -100,7 +102,11 @@ class MultiProblemBlock(LibraryContentBlock):
 
     display_feedback = String(
         display_name=_('Display feedback'),
-        help=_('Defines when to show feedback i.e. correctness in the problem slides.'),
+        help=_(
+            'Defines when to show feedback i.e. correctness in the problem slides. '
+            'NOTE: Do not change this field and `Library` field together, child show correctness field '
+            'will not be updated.'
+        ),
         scope=Scope.settings,
         default=DISPLAYFEEDBACK.IMMEDIATELY,
         values=[
