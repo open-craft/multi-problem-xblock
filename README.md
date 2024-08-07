@@ -22,7 +22,7 @@ $ pip install -r requirements.txt
 
 ### Enabling in Studio
 
-Go to `Settings -> Advanced` Settings and add `multi-problem` to `Advanced Module List`.
+Go to `Settings -> Advanced` Settings and add `multi_problem` to `Advanced Module List`.
 
 ### Usage
 
