@@ -22,39 +22,39 @@ function MultiProblemBlock(runtime, element, initArgs) {
     next_page_on_submit: nextPageOnSubmit = false,
   } = initArgs;
 
-  function showSlide(n) {
+  function showSlide(num) {
     var slides = $('.slide', element);
-    slides[n].style.display = "block";
+    slides[num].style.display = "block";
     //... and fix the Previous/Next buttons:
-    if (n == 0) {
+    if (num == 0) {
       $(".prevBtn", element).prop('disabled', true);
     } else {
       $(".prevBtn", element).prop('disabled', false);
     }
-    if (n >= (slides.length - 1)) {
+    if (num >= (slides.length - 1)) {
       $(".nextBtn", element).prop('disabled', true);
     } else {
       $(".nextBtn", element).prop('disabled', false);
     }
     //... and run a function that will display the correct step indicator:
-    updateStepIndicator(n, slides.length)
+    updateStepIndicator(num, slides.length)
   }
 
-  function updateStepIndicator(n, total) {
+  function updateStepIndicator(num, total) {
     $('.slide-position', element).text(
-      gettext('{current_position} of {total}').replace('{current_position}', n + 1).replace('{total}', total)
+      gettext('{current_position} of {total}').replace('{current_position}', num + 1).replace('{total}', total)
     );
     $.post({
       url: runtime.handlerUrl(element, 'handle_slide_change'),
-      data: JSON.stringify({ current_slide: n }),
+      data: JSON.stringify({ current_slide: num }),
     });
   }
 
-  function nextPrev(n) {
+  function nextPrev(num) {
     // This function will figure out which tab to display
     var slides = $('.slide', element);
     // Calculate next slide position
-    var nextSlide = currentSlide + n;
+    var nextSlide = currentSlide + num;
     // if you have reached the end of the form...
     if (nextSlide >= slides.length) {
       return false;
