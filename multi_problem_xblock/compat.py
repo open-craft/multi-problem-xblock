@@ -14,8 +14,12 @@ def getLibraryContentBlock():
     try:
         from xmodule.library_content_block import LibraryContentBlock  # pylint: disable=import-outside-toplevel
     except ModuleNotFoundError:
-        log.warning('LibraryContentBlock not found, using empty object')
-        LibraryContentBlock = XBlock
+        try:
+            # Support for olive version
+            from xmodule.library_content_module import LibraryContentBlock  # pylint: disable=import-outside-toplevel
+        except ModuleNotFoundError:
+            log.warning('LibraryContentBlock not found, using empty object')
+            LibraryContentBlock = XBlock
     return LibraryContentBlock
 
 
@@ -56,7 +60,13 @@ def getShowAnswerOptions():
 
         return SHOWANSWER
     except ModuleNotFoundError:
-        log.warning('SHOWANSWER not found, using local copy')
+        try:
+            # Support for olive version
+            from xmodule.capa_module import SHOWANSWER  # pylint: disable=import-outside-toplevel
+
+            return SHOWANSWER
+        except ModuleNotFoundError:
+            log.warning('SHOWANSWER not found, using local copy')
         return L_SHOWANSWER
 
 
