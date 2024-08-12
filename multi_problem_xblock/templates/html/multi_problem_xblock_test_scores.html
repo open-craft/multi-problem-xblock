@@ -1,0 +1,70 @@
+{% load i18n %}
+
+<!--Test results-->
+<div class="multi-problem-test-results px-4 pt-5 pb-4">
+  <div class="problem-slide-header">
+    {% if allow_back_button %}
+    <button type="button" class="back-to-problems btn-default btn-primary-outline">
+      <svg width="7" height="11" viewBox="0 0 7 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.6668 10.5L6.8418 9.325L3.02513 5.5L6.8418 1.675L5.6668 0.5L0.666798 5.5L5.6668 10.5Z" fill="#15376D"/>
+      </svg>
+    </button>
+    {% else %}
+    <!--Empty div to have some space-->
+    <div class="py-4" />
+    {% endif %}
+    <div class="score-header-text text-center">
+      <small class="text-gray">
+        {% trans 'Complete!' %}
+      </small>
+      <h2 class="hd hd-2 text-center">{% trans 'Test score' %}</h2>
+    </div>
+  </div>
+  <div class="accordion-container m-3 mt-5">
+    {% for question_answer in question_answers %}
+    <button class="accordion p-3 d-inline-flex{% if question_answer.is_correct %} correct {% else %} incorrect {% endif %}">
+      {{ question_answer.question }}
+    </button>
+    <div class="panel pl-4">
+      {% if question_answer.is_correct %}
+      <div class="p-4">
+        <span class="correct d-inline-flex">
+          <b class="mr-2">{% trans 'Correct: ' %}</b> {{ question_answer.answer }}
+        </span>
+        <div class="pl-4 ml-2 pt-2">
+          {{ question_answer.msg | safe }}
+        </div>
+      </div>
+      {% else %}
+      <div class="p-4">
+        <span class="incorrect d-inline-flex">
+          <b class="mr-2">{% trans 'Your Answer: ' %}</b> {{ question_answer.answer }}
+        </span>
+      </div>
+      {% if question_answer.correct_answer %}
+      <div class="px-4 pb-4">
+        <span class="correct d-inline-flex">
+          <b class="mr-2">{% trans 'Correct Answer: ' %}</b> {{ question_answer.correct_answer }}
+        </span>
+        <div class="pl-4 ml-2 pt-2">
+          {{ question_answer.msg | safe }}
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="test-score-row p-3 pl-5 hd-5">
+      <b>{% trans 'Test Score' %}</b>
+      {% if cut_off_score != '' %}<sup>1</sup>{% endif %}
+      <b class="test-score{% if not passed %} text-red{% endif %}">{{ score }}</b>
+    </div>
+  </div>
+  {% if cut_off_score != '' %}
+  <small class="pl-3">
+    <sup>1</sup>
+    {% trans 'Minimum score required for this to be marked as complete: ' %}
+    {{ cut_off_score }}
+  </small>
+  {% endif %}
+</div>

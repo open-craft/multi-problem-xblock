@@ -1,6 +1,6 @@
 
             (function(global){
-                var DragAndDropI18N = {
+                var MultiProblemI18N = {
                   init: function() {
                     
 
@@ -10,14 +10,7 @@
   const django = globals.django || (globals.django = {});
 
   
-  django.pluralidx = function(n) {
-    const v = (n != 1);
-    if (typeof v === 'boolean') {
-      return v ? 1 : 0;
-    } else {
-      return v;
-    }
-  };
+  django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };
   
 
   /* gettext library */
@@ -91,7 +84,15 @@
     "DATE_INPUT_FORMATS": [
       "%Y-%m-%d",
       "%m/%d/%Y",
-      "%m/%d/%y"
+      "%m/%d/%y",
+      "%b %d %Y",
+      "%b %d, %Y",
+      "%d %b %Y",
+      "%d %b, %Y",
+      "%B %d %Y",
+      "%B %d, %Y",
+      "%d %B %Y",
+      "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ".",
     "FIRST_DAY_OF_WEEK": 0,
@@ -135,7 +136,7 @@
 
                   }
                 };
-                DragAndDropI18N.init();
-                global.DragAndDropI18N = DragAndDropI18N;
+                MultiProblemI18N.init();
+                global.MultiProblemI18N = MultiProblemI18N;
             }(this));
         
