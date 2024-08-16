@@ -1,6 +1,3 @@
-// Exact copy of
-// https://github.com/open-craft/edx-platform/blob/9a97ea78d9774f969dcafeda24af137e2055b669/xmodule/assets/library_content/public/js/library_content_edit.js
-// for local_resource_url to work in studio and author view.
 /* JavaScript for special editing operations that can be done on LibraryContentXBlock */
 window.LibraryContentAuthorView = function(runtime, element) {
     'use strict';
@@ -10,6 +7,8 @@ window.LibraryContentAuthorView = function(runtime, element) {
     // But it is still inside this xblock's wrapper element, which we can easily find:
     var $wrapper = $element.parents('*[data-locator="' + usage_id + '"]');
 
+    // We can't bind to the button itself because in the bok choy test environment,
+    // it may not yet exist at this point in time... not sure why.
     $wrapper.on('click', '.library-update-btn', function(e) {
         e.preventDefault();
         // Update the XBlock with the latest matching content from the library:
@@ -18,7 +17,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
             element: element,
             message: gettext('Updating with latest library content')
         });
-        $.post(runtime.handlerUrl(element, 'upgrade_and_sync')).done(function() {
+        $.post(runtime.handlerUrl(element, 'refresh_children')).done(function() {
             runtime.notify('save', {
                 state: 'end',
                 element: element
@@ -34,22 +33,4 @@ window.LibraryContentAuthorView = function(runtime, element) {
             }
         });
     });
-    // Hide loader and show element when update task finished.
-    var $loader = $wrapper.find('.ui-loading');
-    var $xblockHeader = $wrapper.find('.xblock-header');
-    if (!$loader.hasClass('is-hidden')) {
-        var timer = setInterval(function() {
-            $.get(runtime.handlerUrl(element, 'children_are_syncing'), function( data ) {
-                if (data !== true) {
-                    $loader.addClass('is-hidden');
-                    $xblockHeader.removeClass('is-hidden');
-                    clearInterval(timer);
-                    runtime.notify('save', {
-                        state: 'end',
-                        element: element
-                    });
-                }
-            })
-        }, 1000);
-    }
 };

@@ -23,7 +23,7 @@ def instantiate_block(cls, fields=None):
     Instantiate the given XBlock in a mock runtime.
     """
     fields = fields or {}
-    usage_key = fields.pop('usage_key')
+    location = fields.pop('location')
     children = fields.pop('children', {})
     field_data = DictFieldData(fields or {})
     block = cls(
@@ -33,8 +33,8 @@ def instantiate_block(cls, fields=None):
     )
     block.children = children
     block.runtime.get_block = lambda child_id: children[child_id]
-    block.usage_key.__str__.return_value = usage_key
-    block.usage_key.course_key.make_usage_key = lambda _, child_id: child_id
+    block.location.__str__.return_value = location
+    block.location.course_key.make_usage_key = lambda _, child_id: child_id
     block.get_children = lambda: list(children.values())
     return block
 
@@ -51,6 +51,10 @@ class SampleProblemBlock(ProblemBlock):
         self.lcp.find_question_label.side_effect = [f'question{x}' for x in range(3)]
         self.lcp.find_answer_text.side_effect = [f'answer{x}' for x in range(3)]
         self.lcp.find_correct_answer_text.side_effect = [f'correct_answer{x}' for x in range(3)]
+
+    @property
+    def location(self):
+        return self.scope_ids.usage_id
 
 
 class TestCaseMixin:

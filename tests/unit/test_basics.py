@@ -2,11 +2,16 @@ import unittest
 from unittest import mock
 
 import ddt
-
 from multi_problem_xblock.compat import L_SHOWANSWER, L_ShowCorrectness
 from multi_problem_xblock.multi_problem_xblock import DISPLAYFEEDBACK, SCORE_DISPLAY_FORMAT, MultiProblemBlock
 
 from ..utils import SampleProblemBlock, TestCaseMixin, instantiate_block
+
+
+class MultiProblemBlockSample(MultiProblemBlock):
+    @property
+    def location(self):
+        return self.scope_ids.usage_id
 
 
 @ddt.ddt
@@ -17,14 +22,14 @@ class BasicTests(TestCaseMixin, unittest.TestCase):
         self.children_ids = []
         self.children = {}
         for i in range(3):
-            usage_key = f'block-v1:edx+cs1+test+type@problem+block@{i}'
+            location = f'block-v1:edx+cs1+test+type@problem+block@{i}'
             problem_block = instantiate_block(SampleProblemBlock, fields={
-                'usage_key': usage_key,
+                'location': location,
             })
-            self.children[usage_key] = problem_block
-            self.children_ids.append(usage_key)
-        self.block = instantiate_block(MultiProblemBlock, fields={
-            'usage_key': 'block-v1:edx+cs1+test+type@multi_problem+block@1',
+            self.children[location] = problem_block
+            self.children_ids.append(location)
+        self.block = instantiate_block(MultiProblemBlockSample, fields={
+            'location': 'block-v1:edx+cs1+test+type@multi_problem+block@1',
             'children': self.children,
         })
         self.block.selected_children = lambda: [('problem', child) for child in self.children]

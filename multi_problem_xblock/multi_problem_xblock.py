@@ -207,7 +207,7 @@ class MultiProblemBlock(LibraryContentBlock):
         for index, (block_type, block_id) in enumerate(self.selected_children()):
             if filter_block_type and (block_type != filter_block_type):
                 continue
-            child = self.runtime.get_block(self.usage_key.course_key.make_usage_key(block_type, block_id))
+            child = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
             yield (index, block_type, child)
 
     def _get_problem_stats(self):
@@ -334,7 +334,7 @@ class MultiProblemBlock(LibraryContentBlock):
             child_context['username'] = user_service.get_current_user().opt_attrs.get('edx-platform.username')
 
         for index, block_type, child in self._children_iterator():
-            child_id = str(child.usage_key)
+            child_id = str(child.location)
             if child is None:
                 # https://github.com/openedx/edx-platform/blob/448acc95f6296c72097102441adc4e1f79a7444f/xmodule/library_content_block.py#L391-L396
                 logger.error('Skipping display for child block that is None')
@@ -356,7 +356,7 @@ class MultiProblemBlock(LibraryContentBlock):
                     'content': rendered_child.content,
                     'bookmark_id': '{},{}'.format(child_context['username'], child_id),
                     'is_bookmarked': (
-                        bookmarks_service.is_bookmarked(usage_key=child.usage_key) if bookmarks_service else False
+                        bookmarks_service.is_bookmarked(usage_key=child.location) if bookmarks_service else False
                     ),
                 }
             )
@@ -423,16 +423,16 @@ class MultiProblemBlock(LibraryContentBlock):
                 if system.error_tracker is not None:
                     system.error_tracker(msg)
 
-        definition = dict(xml_object.attrib.items())
+        definition = {attr_name: json.loads(attr_value) for attr_name, attr_value in xml_object.attrib.items()}
         return definition, children
 
     def definition_to_xml(self, resource_fs):
-        """Exports Library Content Block to XML"""
+        """Exports Multi Problem block to XML"""
         xml_object = etree.Element('multi_problem')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.items():
+        for field_name, field in self.fields.items():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
