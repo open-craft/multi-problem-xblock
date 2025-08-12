@@ -40,7 +40,7 @@ extract_translations: ## extract strings to be translated, outputting .po files
 
 compile_translations: ## compile translation files, outputting .mo files for each supported language
 	cd $(WORKING_DIR) && i18n_tool generate -v
-	python manage.py compilejsi18n --namespace DragAndDropI18N --output $(JS_TARGET)
+	python manage.py compilejsi18n --namespace MultiProblemI18N --output $(JS_TARGET)
 
 detect_changed_source_translations:
 	cd $(WORKING_DIR) && i18n_tool changed
@@ -71,7 +71,7 @@ test.python: ## run python unit tests in the local virtualenv
 	pytest --cov multi_problem_xblock $(TEST)
 
 test.unit: ## run all unit tests
-	tox $(TEST)
+	tox -- $(TEST)
 
 test: test.unit test.quality ## Run all tests
 	tox -e translations
