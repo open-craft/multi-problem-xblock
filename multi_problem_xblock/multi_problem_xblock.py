@@ -368,6 +368,15 @@ class MultiProblemBlock(LibraryContentBlock):
         if overall_progress == 100 and self.current_slide == -1 and self.display_feedback == DISPLAYFEEDBACK.NEVER:
             self.current_slide = 0
 
+        # Clamp current_slide to a valid index when the number of items changes
+        # Keep -1 as a special value to show the test results slide
+        num_items = len(items)
+        if self.current_slide != -1:
+            if num_items == 0:
+                self.current_slide = 0
+            elif self.current_slide >= num_items:
+                self.current_slide = 0
+
         template_context = {
             'items': items,
             'self': self,
