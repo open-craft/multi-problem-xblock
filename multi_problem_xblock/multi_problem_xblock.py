@@ -372,9 +372,7 @@ class MultiProblemBlock(LibraryContentBlock):
         # Keep -1 as a special value to show the test results slide
         num_items = len(items)
         if self.current_slide != -1:
-            if num_items == 0:
-                self.current_slide = 0
-            elif self.current_slide >= num_items:
+            if self.current_slide < -1 or self.current_slide >= num_items:
                 self.current_slide = 0
 
         template_context = {
