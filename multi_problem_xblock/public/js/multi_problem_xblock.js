@@ -24,6 +24,10 @@ function MultiProblemBlock(runtime, element, initArgs) {
 
   function showSlide(num) {
     var slides = $('.slide', element);
+    // Guard against out-of-range indices
+    if (num < 0 || num >= slides.length) {
+      num = 0;
+    }
     slides[num].style.display = "block";
     //... and fix the Previous/Next buttons:
     if (num == 0) {
@@ -55,8 +59,8 @@ function MultiProblemBlock(runtime, element, initArgs) {
     var slides = $('.slide', element);
     // Calculate next slide position
     var nextSlide = currentSlide + num;
-    // if you have reached the end of the form...
-    if (nextSlide >= slides.length) {
+    // if you have reached the end or before start of the form...
+    if (nextSlide < 0 || nextSlide >= slides.length) {
       return false;
     }
     // Hide the current tab:
@@ -174,6 +178,11 @@ function MultiProblemBlock(runtime, element, initArgs) {
   if (currentSlide === -1) {
     $('.see-test-results', element).trigger('click');
   } else {
+    // Ensure initial slide index is valid
+    var initSlides = $('.slide', element);
+    if (currentSlide >= initSlides.length) {
+      currentSlide = 0;
+    }
     showSlide(currentSlide)
   }
 
