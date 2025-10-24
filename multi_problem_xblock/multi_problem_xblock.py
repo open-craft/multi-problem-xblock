@@ -371,9 +371,8 @@ class MultiProblemBlock(LibraryContentBlock):
         # Clamp current_slide to a valid index when the number of items changes
         # Keep -1 as a special value to show the test results slide
         num_items = len(items)
-        if self.current_slide != -1:
-            if self.current_slide < -1 or self.current_slide >= num_items:
-                self.current_slide = 0
+        if self.current_slide < -1 or self.current_slide >= num_items:
+            self.current_slide = 0
 
         template_context = {
             'items': items,
